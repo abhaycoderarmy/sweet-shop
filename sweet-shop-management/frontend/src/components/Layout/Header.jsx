@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiHome, FiSettings, FiLogOut, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -10,424 +12,138 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
+    toast.success('👋 Logged out successfully');
     navigate('/login');
     setMobileMenuOpen(false);
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
   return (
-    <header style={{
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      backdropFilter: 'blur(10px)',
-      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-    }}>
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '1rem 1.5rem'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className="sticky top-0 z-50 glass border-b border-white/20 shadow-lg"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link 
-            to="/" 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.75rem', 
-              textDecoration: 'none', 
-              color: '#fff',
-              transition: 'transform 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: '12px',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <span style={{ fontSize: '1.75rem' }}>🍬</span>
-            </div>
-            <span style={{ 
-              fontWeight: 700, 
-              fontSize: '1.5rem',
-              background: 'linear-gradient(to right, #fff, #f0f0f0)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
+          <Link to="/" className="flex items-center gap-3 group">
+            <motion.div
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.5 }}
+              className="bg-gradient-primary p-3 rounded-xl shadow-lg"
+            >
+              <span className="text-3xl">🍬</span>
+            </motion.div>
+            <span className="text-2xl font-black gradient-text hidden sm:block">
               Sweet Shop
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '2rem',
-            '@media (max-width: 768px)': {
-              display: 'none'
-            }
-          }}
-          className="desktop-nav">
-            <Link 
-              to="/" 
-              style={{ 
-                color: '#fff', 
-                textDecoration: 'none', 
-                fontWeight: 500, 
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <span>🏠</span>
-              <span>Home</span>
-            </Link>
-
+          <nav className="hidden md:flex items-center gap-4">
+            <NavLink to="/" icon={<FiHome />} text="Home" />
+            {isAdmin && <NavLink to="/admin" icon={<FiSettings />} text="Admin" />}
+            
             {isAuthenticated ? (
               <>
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    style={{ 
-                      color: '#fff', 
-                      textDecoration: 'none', 
-                      fontWeight: 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '8px',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    <span>⚙️</span>
-                    <span>Admin</span>
-                  </Link>
-                )}
-                
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '20px',
-                  backdropFilter: 'blur(10px)'
-                }}>
-                  <span>👤</span>
-                  <span style={{ fontWeight: 500 }}>{user?.username}</span>
+                <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
+                  <FiUser className="text-primary-600" />
+                  <span className="font-semibold text-gray-700">{user?.username}</span>
                 </div>
-
-                <button 
-                  onClick={handleLogout} 
-                  style={{ 
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    color: '#fff', 
-                    border: '2px solid rgba(255, 255, 255, 0.3)', 
-                    borderRadius: '12px', 
-                    padding: '0.625rem 1.25rem', 
-                    cursor: 'pointer', 
-                    fontWeight: 600,
-                    fontSize: '0.95rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    transition: 'all 0.3s ease',
-                    backdropFilter: 'blur(10px)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                <motion.button
+                  onClick={handleLogout}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn-secondary flex items-center gap-2"
                 >
-                  <span>🚪</span>
+                  <FiLogOut />
                   <span>Logout</span>
-                </button>
+                </motion.button>
               </>
             ) : (
               <>
-                <Link 
-                  to="/login" 
-                  style={{ 
-                    color: '#fff', 
-                    textDecoration: 'none', 
-                    fontWeight: 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '8px',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <span>🔐</span>
-                  <span>Login</span>
-                </Link>
-
-                <Link 
-                  to="/register" 
-                  style={{ 
-                    background: '#fff', 
-                    color: '#667eea', 
-                    borderRadius: '12px', 
-                    padding: '0.625rem 1.5rem', 
-                    fontWeight: 700, 
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 15px rgba(255, 255, 255, 0.2)',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.2)';
-                  }}
-                >
-                  <span>✨</span>
-                  <span>Register</span>
-                </Link>
+                <Link to="/login" className="btn-secondary">Login</Link>
+                <Link to="/register" className="btn-primary">Register</Link>
               </>
             )}
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMobileMenu}
-            style={{
-              display: 'none',
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              color: '#fff',
-              fontSize: '1.5rem',
-              transition: 'all 0.3s ease'
-            }}
-            className="mobile-menu-btn"
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden glass p-3 rounded-xl"
           >
-            {mobileMenuOpen ? '✕' : '☰'}
-          </button>
+            {mobileMenuOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}
+          </motion.button>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav style={{
-            display: 'none',
-            flexDirection: 'column',
-            gap: '0.5rem',
-            marginTop: '1rem',
-            padding: '1rem',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '12px',
-            backdropFilter: 'blur(10px)'
-          }}
-          className="mobile-nav">
-            <Link 
-              to="/" 
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ 
-                color: '#fff', 
-                textDecoration: 'none', 
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-              <span>🏠</span>
-              <span>Home</span>
-            </Link>
-
-            {isAuthenticated ? (
-              <>
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    onClick={() => setMobileMenuOpen(false)}
-                    style={{ 
-                      color: '#fff', 
-                      textDecoration: 'none', 
-                      fontWeight: 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '8px',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                  >
-                    <span>⚙️</span>
-                    <span>Admin</span>
-                  </Link>
-                )}
-                
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  background: 'rgba(255, 255, 255, 0.15)'
-                }}>
-                  <span>👤</span>
-                  <span style={{ fontWeight: 500 }}>{user?.username}</span>
-                </div>
-
-                <button 
-                  onClick={handleLogout} 
-                  style={{ 
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    color: '#fff', 
-                    border: '2px solid rgba(255, 255, 255, 0.3)', 
-                    borderRadius: '8px', 
-                    padding: '0.75rem 1rem', 
-                    cursor: 'pointer', 
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    width: '100%',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
-                >
-                  <span>🚪</span>
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link 
-                  to="/login" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ 
-                    color: '#fff', 
-                    textDecoration: 'none', 
-                    fontWeight: 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '8px',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                  <span>🔐</span>
-                  <span>Login</span>
-                </Link>
-
-                <Link 
-                  to="/register" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ 
-                    background: '#fff', 
-                    color: '#667eea', 
-                    borderRadius: '8px', 
-                    padding: '0.75rem 1rem', 
-                    fontWeight: 700, 
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <span>✨</span>
-                  <span>Register</span>
-                </Link>
-              </>
-            )}
-          </nav>
-        )}
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-          .mobile-menu-btn {
-            display: block !important;
-          }
-          .mobile-nav {
-            display: flex !important;
-          }
-        }
-      `}</style>
-    </header>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden glass border-t border-white/20"
+          >
+            <div className="px-4 py-6 space-y-3">
+              <MobileNavLink to="/" icon={<FiHome />} text="Home" onClick={() => setMobileMenuOpen(false)} />
+              {isAdmin && <MobileNavLink to="/admin" icon={<FiSettings />} text="Admin" onClick={() => setMobileMenuOpen(false)} />}
+              
+              {isAuthenticated ? (
+                <>
+                  <div className="glass px-4 py-3 rounded-xl flex items-center gap-2">
+                    <FiUser className="text-primary-600" />
+                    <span className="font-semibold">{user?.username}</span>
+                  </div>
+                  <button onClick={handleLogout} className="w-full btn-secondary flex items-center justify-center gap-2">
+                    <FiLogOut />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full btn-secondary text-center">
+                    Login
+                  </Link>
+                  <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block w-full btn-primary text-center">
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 };
+
+const NavLink = ({ to, icon, text }) => (
+  <Link to={to}>
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-white/50 transition-all font-semibold text-gray-700"
+    >
+      {icon}
+      <span>{text}</span>
+    </motion.div>
+  </Link>
+);
+
+const MobileNavLink = ({ to, icon, text, onClick }) => (
+  <Link to={to} onClick={onClick} className="block">
+    <motion.div
+      whileTap={{ scale: 0.95 }}
+      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/50 transition-all font-semibold text-gray-700"
+    >
+      {icon}
+      <span>{text}</span>
+    </motion.div>
+  </Link>
+);
 
 export default Header;

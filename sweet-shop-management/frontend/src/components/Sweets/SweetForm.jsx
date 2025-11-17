@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FiUpload, FiX, FiSave, FiImage } from 'react-icons/fi';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -14,6 +16,7 @@ const SweetForm = ({ sweet, onSuccess, onCancel }) => {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
   const categories = ['chocolate', 'candy', 'gummy', 'lollipop', 'toffee', 'other'];
 
@@ -38,14 +41,30 @@ const SweetForm = ({ sweet, onSuccess, onCancel }) => {
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (file) => {
     if (file) {
       setImageFile(file);
       setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setImageFile(null);
-      setPreviewUrl(formData.imageUrl || '');
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileChange(e.dataTransfer.files[0]);
     }
   };
 
@@ -71,12 +90,12 @@ const SweetForm = ({ sweet, onSuccess, onCancel }) => {
         await api.put(`/sweets/${sweet._id}`, payload, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        toast.success('Sweet updated successfully');
+        toast.success('✅ Sweet updated successfully!');
       } else {
         await api.post('/sweets', payload, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        toast.success('Sweet created successfully');
+        toast.success('✅ Sweet created successfully!');
       }
       onSuccess();
     } catch (error) {
@@ -87,469 +106,221 @@ const SweetForm = ({ sweet, onSuccess, onCancel }) => {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      padding: '2rem',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
-      <div style={{ 
-        background: '#fff',
-        borderRadius: '24px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-        padding: '3rem',
-        maxWidth: '700px',
-        width: '100%',
-        position: 'relative'
-      }}>
-        {/* Header */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '2rem'
-        }}>
-          <div style={{
-            display: 'inline-block',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '16px',
-            padding: '1rem',
-            marginBottom: '1rem'
-          }}>
-            <span style={{ fontSize: '2.5rem' }}>
-              {sweet ? '✏️' : '➕'}
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto"
+      >
+        <div className="glass rounded-3xl shadow-2xl p-8 md:p-12">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="inline-block bg-gradient-primary rounded-2xl p-4 mb-4"
+            >
+              <span className="text-5xl">
+                {sweet ? '✏️' : '➕'}
+              </span>
+            </motion.div>
+            <h2 className="text-4xl font-black gradient-text mb-2">
+              {sweet ? 'Edit Sweet' : 'Add New Sweet'}
+            </h2>
+            <p className="text-gray-600 text-lg">
+              {sweet ? 'Update the details below' : 'Fill in the details to add a new sweet'}
+            </p>
           </div>
-          <h2 style={{ 
-            color: '#667eea', 
-            fontWeight: 800,
-            fontSize: '2rem',
-            margin: 0
-          }}>
-            {sweet ? 'Edit Sweet' : 'Add New Sweet'}
-          </h2>
-          <p style={{
-            color: '#6B7280',
-            fontSize: '1rem',
-            marginTop: '0.5rem'
-          }}>
-            {sweet ? 'Update the details below' : 'Fill in the details to add a new sweet'}
-          </p>
-        </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Image Upload Section */}
-          {previewUrl && (
-            <div style={{ 
-              marginBottom: '2rem',
-              textAlign: 'center',
-              position: 'relative'
-            }}>
-              <div style={{
-                display: 'inline-block',
-                position: 'relative',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                boxShadow: '0 8px 30px rgba(102, 126, 234, 0.2)'
-              }}>
-                <img 
-                  src={previewUrl} 
-                  alt="preview" 
-                  style={{ 
-                    maxWidth: '100%',
-                    maxHeight: '250px',
-                    display: 'block',
-                    borderRadius: '16px'
-                  }} 
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              {previewUrl && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative rounded-2xl overflow-hidden shadow-xl max-w-md mx-auto"
+                >
+                  <img
+                    src={previewUrl}
+                    alt="preview"
+                    className="w-full h-64 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setPreviewUrl('');
+                    }}
+                    className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                  >
+                    <FiX className="text-xl" />
+                  </button>
+                </motion.div>
+              )}
+
+              <div
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                className={`relative border-4 border-dashed rounded-2xl p-8 transition-all duration-300 ${
+                  dragActive
+                    ? 'border-primary-500 bg-primary-50'
+                    : 'border-gray-300 hover:border-primary-400 bg-white/50'
+                }`}
+              >
+                <input
+                  type="file"
+                  id="image"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e.target.files[0])}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="image"
+                  className="cursor-pointer flex flex-col items-center justify-center space-y-4"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    className="bg-gradient-primary text-white p-6 rounded-full"
+                  >
+                    {imageFile ? <FiImage className="text-4xl" /> : <FiUpload className="text-4xl" />}
+                  </motion.div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-gray-700">
+                      {imageFile ? imageFile.name : 'Click to upload or drag and drop'}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      PNG, JPG, GIF up to 5MB
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Sweet Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., Chocolate Delight"
+                  className="input-field"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Category *
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  className="input-field"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Price ($) *
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  className="input-field"
+                />
+              </div>
+
+              {/* Quantity */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  placeholder="0"
+                  className="input-field"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe your sweet product..."
+                  rows="4"
+                  className="input-field resize-none"
                 />
               </div>
             </div>
-          )}
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label 
-              htmlFor="image"
-              style={{ 
-                display: 'block',
-                marginBottom: '0.75rem',
-                color: '#667eea',
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              📸 Product Image
-            </label>
-            <label 
-              htmlFor="image" 
-              style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.75rem',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: '#fff',
-                borderRadius: '12px',
-                padding: '1rem 2rem',
-                fontWeight: 700,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
-              }}
-            >
-              <span style={{ fontSize: '1.5rem' }}>
-                {imageFile ? '✅' : previewUrl ? '🔄' : '📁'}
-              </span>
-              <span>
-                {imageFile ? imageFile.name : previewUrl ? 'Change Image' : 'Choose Image'}
-              </span>
-            </label>
-            <input
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            <small style={{ 
-              display: 'block',
-              marginTop: '0.75rem',
-              color: '#6B7280',
-              fontSize: '0.9rem'
-            }}>
-              💡 Supported formats: JPG, PNG, GIF (Max 5MB)
-            </small>
-          </div>
-
-          {/* Name Field */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label 
-              htmlFor="name"
-              style={{ 
-                display: 'block',
-                marginBottom: '0.5rem',
-                color: '#667eea',
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              Sweet Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="e.g., Chocolate Delight"
-              style={{ 
-                width: '100%',
-                padding: '1rem 1.25rem',
-                borderRadius: '12px',
-                border: '2px solid rgba(102, 126, 234, 0.2)',
-                fontSize: '1rem',
-                transition: 'all 0.3s ease',
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#667eea';
-                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(102, 126, 234, 0.2)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            />
-          </div>
-
-          {/* Category Field */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label 
-              htmlFor="category"
-              style={{ 
-                display: 'block',
-                marginBottom: '0.5rem',
-                color: '#667eea',
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              Category *
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-              style={{ 
-                width: '100%',
-                padding: '1rem 1.25rem',
-                borderRadius: '12px',
-                border: '2px solid rgba(102, 126, 234, 0.2)',
-                fontSize: '1rem',
-                transition: 'all 0.3s ease',
-                outline: 'none',
-                cursor: 'pointer',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#667eea';
-                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(102, 126, 234, 0.2)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Price and Quantity Row */}
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1rem',
-            marginBottom: '1.5rem'
-          }}>
-            <div>
-              <label 
-                htmlFor="price"
-                style={{ 
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  color: '#667eea',
-                  fontWeight: 600,
-                  fontSize: '1rem'
-                }}
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={!loading ? { scale: 1.02 } : {}}
+                whileTap={!loading ? { scale: 0.98 } : {}}
+                className={`btn-primary flex items-center justify-center gap-3 text-lg ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Price ($) *
-              </label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                style={{ 
-                  width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '12px',
-                  border: '2px solid rgba(102, 126, 234, 0.2)',
-                  fontSize: '1rem',
-                  transition: 'all 0.3s ease',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#667eea';
-                  e.currentTarget.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(102, 126, 234, 0.2)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              />
-            </div>
+                <FiSave className="text-xl" />
+                <span>{loading ? 'Saving...' : (sweet ? 'Update Sweet' : 'Add Sweet')}</span>
+              </motion.button>
 
-            <div>
-              <label 
-                htmlFor="quantity"
-                style={{ 
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  color: '#667eea',
-                  fontWeight: 600,
-                  fontSize: '1rem'
-                }}
+              <motion.button
+                type="button"
+                onClick={onCancel}
+                disabled={loading}
+                whileHover={!loading ? { scale: 1.02 } : {}}
+                whileTap={!loading ? { scale: 0.98 } : {}}
+                className={`btn-secondary flex items-center justify-center gap-3 text-lg ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Quantity *
-              </label>
-              <input
-                type="number"
-                id="quantity"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                required
-                min="0"
-                placeholder="0"
-                style={{ 
-                  width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '12px',
-                  border: '2px solid rgba(102, 126, 234, 0.2)',
-                  fontSize: '1rem',
-                  transition: 'all 0.3s ease',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#667eea';
-                  e.currentTarget.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(102, 126, 234, 0.2)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              />
+                <FiX className="text-xl" />
+                <span>Cancel</span>
+              </motion.button>
             </div>
-          </div>
-
-          {/* Description Field */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label 
-              htmlFor="description"
-              style={{ 
-                display: 'block',
-                marginBottom: '0.5rem',
-                color: '#667eea',
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe your sweet product..."
-              rows="4"
-              style={{ 
-                width: '100%',
-                padding: '1rem 1.25rem',
-                borderRadius: '12px',
-                border: '2px solid rgba(102, 126, 234, 0.2)',
-                fontSize: '1rem',
-                transition: 'all 0.3s ease',
-                outline: 'none',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#667eea';
-                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(102, 126, 234, 0.2)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1rem'
-          }}>
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{ 
-                background: loading 
-                  ? 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%)'
-                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '1rem 2rem',
-                fontWeight: 700,
-                fontSize: '1.05rem',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
-                opacity: loading ? 0.7 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
-                }
-              }}
-            >
-              <span style={{ fontSize: '1.3rem' }}>
-                {loading ? '⏳' : (sweet ? '✏️' : '➕')}
-              </span>
-              <span>
-                {loading ? 'Saving...' : (sweet ? 'Update Sweet' : 'Add Sweet')}
-              </span>
-            </button>
-
-            <button 
-              type="button" 
-              onClick={onCancel}
-              disabled={loading}
-              style={{ 
-                background: '#fff',
-                color: '#667eea',
-                border: '2px solid #667eea',
-                borderRadius: '12px',
-                padding: '1rem 2rem',
-                fontWeight: 700,
-                fontSize: '1.05rem',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.3s ease',
-                opacity: loading ? 0.5 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.background = '#667eea';
-                  e.currentTarget.style.color = '#fff';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.background = '#fff';
-                  e.currentTarget.style.color = '#667eea';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }
-              }}
-            >
-              <span style={{ fontSize: '1.3rem' }}>✕</span>
-              <span>Cancel</span>
-            </button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 };

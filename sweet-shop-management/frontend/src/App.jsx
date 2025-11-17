@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,33 +13,25 @@ import SweetList from './components/Sweets/SweetList';
 import SweetForm from './components/Sweets/SweetForm';
 import AdminPanel from './components/Admin/AdminPanel';
 
-import './styles/App.css';
-
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid rgba(255, 255, 255, 0.3)',
-            borderTop: '4px solid #fff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }} />
-          <p style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 600 }}>Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-primary">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"
+          />
+          <p className="text-white text-xl font-bold">Loading...</p>
+        </motion.div>
       </div>
     );
   }
@@ -87,131 +80,92 @@ const Home = () => {
   }
 
   return (
-    <div style={{ 
-      width: '100%', 
-      minHeight: 'calc(100vh - 140px)',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
-    }}>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       {/* Hero Section */}
-      <section style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '4rem 2rem',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
-          pointerEvents: 'none'
-        }} />
-        
-        <div style={{
-          maxWidth: '1400px',
-          margin: '0 auto',
-          textAlign: 'center',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <div style={{
-            display: 'inline-block',
-            background: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '20px',
-            padding: '1rem 2rem',
-            marginBottom: '1.5rem',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <span style={{ fontSize: '3rem' }}>🍬</span>
+      <section className="relative bg-gradient-primary overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 90, 0],
+            }}
+            transition={{ duration: 20, repeat: Infinity }}
+            className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1.2, 1, 1.2],
+              rotate: [0, -90, 0],
+            }}
+            transition={{ duration: 15, repeat: Infinity }}
+            className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="inline-block mb-6"
+            >
+              <div className="bg-white/20 backdrop-blur-xl rounded-3xl p-6">
+                <motion.span
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-8xl"
+                >
+                  🍬
+                </motion.span>
+              </div>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-5xl md:text-7xl font-black text-white mb-6"
+            >
+              Welcome to Sweet Shop
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto"
+            >
+              Your one-stop destination for all things sweet! Discover delicious treats and candies.
+            </motion.p>
+
+            {!isAuthenticated && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+              >
+                <motion.a
+                  href="/login"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white text-primary-600 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all"
+                >
+                  🔐 Login
+                </motion.a>
+                <motion.a
+                  href="/register"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white/20 backdrop-blur-xl text-white border-2 border-white/50 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/30 transition-all"
+                >
+                  ✨ Register
+                </motion.a>
+              </motion.div>
+            )}
           </div>
-          
-          <h1 style={{ 
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
-            fontWeight: 800, 
-            marginBottom: '1rem', 
-            color: '#fff',
-            textShadow: '0 2px 20px rgba(0,0,0,0.1)'
-          }}>
-            Welcome to Sweet Shop
-          </h1>
-          
-          <p style={{ 
-            fontSize: 'clamp(1rem, 2.5vw, 1.5rem)', 
-            fontWeight: 500, 
-            marginBottom: '2rem', 
-            color: 'rgba(255, 255, 255, 0.95)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem'
-          }}>
-            Your one-stop destination for all things sweet! Discover delicious treats and candies.
-          </p>
-          
-          {!isAuthenticated && (
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'center',
-              flexWrap: 'wrap'
-            }}>
-              <a 
-                href="/login" 
-                style={{ 
-                  background: '#fff', 
-                  color: '#667eea', 
-                  borderRadius: '12px', 
-                  padding: '1rem 2.5rem', 
-                  fontWeight: 700, 
-                  fontSize: '1.1rem', 
-                  textDecoration: 'none', 
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(0,0,0,0.2)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
-                }}
-              >
-                <span>🔐</span> Login
-              </a>
-              <a 
-                href="/register" 
-                style={{ 
-                  background: 'rgba(255, 255, 255, 0.2)', 
-                  color: '#fff', 
-                  border: '2px solid rgba(255, 255, 255, 0.5)',
-                  borderRadius: '12px', 
-                  padding: '1rem 2.5rem', 
-                  fontWeight: 700, 
-                  fontSize: '1.1rem', 
-                  textDecoration: 'none',
-                  backdropFilter: 'blur(10px)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <span>✨</span> Register
-              </a>
-            </div>
-          )}
         </div>
       </section>
 
@@ -225,51 +179,41 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div style={{ 
-          minHeight: '100vh', 
-          display: 'flex', 
-          flexDirection: 'column',
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
-        }}>
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
           <Header />
-          <main style={{ flex: 1, width: '100%' }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute adminOnly>
-                    <AdminPanel />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+          <main className="flex-1">
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </AnimatePresence>
           </main>
           <Footer />
           <ToastContainer
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}
-            newestOnTop={false}
+            newestOnTop
             closeOnClick
             rtl={false}
             pauseOnFocusLoss
             draggable
             pauseOnHover
             theme="light"
-            style={{ zIndex: 9999 }}
+            toastClassName="glass"
           />
         </div>
-        
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
       </AuthProvider>
     </Router>
   );

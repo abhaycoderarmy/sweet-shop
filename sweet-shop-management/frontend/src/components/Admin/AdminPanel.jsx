@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FiPlus, FiEdit, FiTrash2, FiPackage, FiAlertCircle } from 'react-icons/fi';
 import api from '../../services/api';
 import SweetForm from '../Sweets/SweetForm';
 import { toast } from 'react-toastify';
@@ -56,7 +58,7 @@ const AdminPanel = () => {
   };
 
   const handleRestock = async (sweet) => {
-    const quantity = prompt(`📦 How many ${sweet.name}(s) to restock? (current: ${sweet.quantity})`, '10');
+    const quantity = prompt(`📦 How many ${sweet.name}(s) to restock?`, '10');
     
     if (quantity === null) return;
     
@@ -77,7 +79,7 @@ const AdminPanel = () => {
   };
 
   const handleDelete = async (sweetId) => {
-    if (!window.confirm('🗑️ Are you sure you want to delete this sweet? This action cannot be undone.')) {
+    if (!window.confirm('🗑️ Are you sure you want to delete this sweet?')) {
       return;
     }
 
@@ -92,9 +94,12 @@ const AdminPanel = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading admin panel...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full"
+        />
       </div>
     );
   }
@@ -110,79 +115,115 @@ const AdminPanel = () => {
   }
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '2rem auto', padding: '2rem', background: '#fff', borderRadius: '24px', boxShadow: '0 4px 24px rgba(25, 118, 210, 0.12)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-        <h2 style={{ color: '#1976d2', fontWeight: 800, fontSize: '2rem' }}>⚙️ Admin Dashboard</h2>
-        <button onClick={handleAddNew} style={{ background: '#1976d2', color: '#fff', borderRadius: '8px', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '1.1rem', boxShadow: '0 2px 8px rgba(21,101,192,0.15)', border: 'none', cursor: 'pointer' }}>
-          ➕ Add New Sweet
-        </button>
-      </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1rem', background: '#fff', borderRadius: '16px', boxShadow: '0 2px 8px rgba(25,118,210,0.08)' }}>
-          <thead>
-            <tr style={{ background: '#e3f2fd', color: '#1976d2', fontWeight: 700 }}>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>🍬 Name</th>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>📂 Category</th>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>💰 Price</th>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>📦 Quantity</th>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>📝 Description</th>
-              <th style={{ padding: '1rem', borderBottom: '2px solid #1976d2' }}>⚡ Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sweets.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                  <div>
-                    <p style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#1976d2' }}>📭 No sweets yet!</p>
-                    <p style={{ color: '#1565c0' }}>Start by adding your first sweet to the collection.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              sweets.map(sweet => (
-                <tr key={sweet._id} style={{ borderBottom: '1px solid #e3f2fd' }}>
-                  <td style={{ padding: '1rem', fontWeight: 600 }}>{sweet.name}</td>
-                  <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{sweet.category}</td>
-                  <td style={{ padding: '1rem', color: '#FF6B9D', fontWeight: 700 }}>${sweet.price.toFixed(2)}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <span style={{ color: sweet.quantity === 0 ? '#EF4444' : '#10B981', fontWeight: 600 }}>
-                      {sweet.quantity === 0 ? '❌ Out' : `✅ ${sweet.quantity}`}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', color: '#374151' }}>
-                    {sweet.description || <em style={{ color: '#9CA3AF' }}>-</em>}
-                  </td>
-                  <td style={{ padding: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button
-                        onClick={() => handleEdit(sweet)}
-                        style={{ background: '#1565c0', color: '#fff', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                        title="Edit sweet"
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        onClick={() => handleRestock(sweet)}
-                        style={{ background: '#10B981', color: '#fff', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                        title="Restock"
-                      >
-                        📦 Restock
-                      </button>
-                      <button
-                        onClick={() => handleDelete(sweet._id)}
-                        style={{ background: '#EF4444', color: '#fff', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                        title="Delete sweet"
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </td>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-3xl shadow-2xl p-8"
+        >
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-4xl font-black gradient-text mb-2">
+                ⚙️ Admin Dashboard
+              </h2>
+              <p className="text-gray-600">Manage your sweet inventory</p>
+            </div>
+            <motion.button
+              onClick={handleAddNew}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-primary flex items-center gap-2"
+            >
+              <FiPlus className="text-xl" />
+              <span>Add New Sweet</span>
+            </motion.button>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-primary text-white">
+                  <th className="px-6 py-4 text-left rounded-tl-xl">Name</th>
+                  <th className="px-6 py-4 text-left">Category</th>
+                  <th className="px-6 py-4 text-left">Price</th>
+                  <th className="px-6 py-4 text-left">Stock</th>
+                  <th className="px-6 py-4 text-left">Description</th>
+                  <th className="px-6 py-4 text-center rounded-tr-xl">Actions</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {sweets.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <FiAlertCircle className="mx-auto text-6xl text-gray-300 mb-4" />
+                      <p className="text-xl font-bold text-gray-600 mb-2">No sweets yet!</p>
+                      <p className="text-gray-500">Start by adding your first sweet</p>
+                    </td>
+                  </tr>
+                ) : (
+                  sweets.map((sweet, index) => (
+                    <motion.tr
+                      key={sweet._id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 font-semibold text-gray-800">{sweet.name}</td>
+                      <td className="px-6 py-4 capitalize text-gray-600">{sweet.category}</td>
+                      <td className="px-6 py-4 font-bold text-primary-600">${sweet.price.toFixed(2)}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold ${
+                          sweet.quantity === 0 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
+                        }`}>
+                          <FiPackage />
+                          {sweet.quantity === 0 ? 'Out' : sweet.quantity}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 max-w-xs truncate">
+                        {sweet.description || <em className="text-gray-400">No description</em>}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <motion.button
+                            onClick={() => handleEdit(sweet)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                            title="Edit"
+                          >
+                            <FiEdit />
+                          </motion.button>
+                          <motion.button
+                            onClick={() => handleRestock(sweet)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
+                            title="Restock"
+                          >
+                            <FiPackage />
+                          </motion.button>
+                          <motion.button
+                            onClick={() => handleDelete(sweet._id)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                            title="Delete"
+                          >
+                            <FiTrash2 />
+                          </motion.button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

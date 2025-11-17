@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import SweetCard from './SweetCard';
 import SearchBar from './SearchBar';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
+import { FiInbox } from 'react-icons/fi';
 
 const SweetList = ({ onEdit }) => {
   const [sweets, setSweets] = useState([]);
@@ -49,7 +51,7 @@ const SweetList = ({ onEdit }) => {
       return;
     }
 
-    const quantity = prompt(`🛒 How many ${sweet.name}(s) to add to your cart? (Available: ${sweet.quantity})`, '1');
+    const quantity = prompt(`🛒 How many ${sweet.name}(s) would you like? (Available: ${sweet.quantity})`, '1');
     
     if (quantity === null) return;
     
@@ -90,137 +92,113 @@ const SweetList = ({ onEdit }) => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '400px',
-        padding: '3rem'
-      }}>
-        <div style={{
-          width: '60px',
-          height: '60px',
-          border: '4px solid rgba(102, 126, 234, 0.2)',
-          borderTop: '4px solid #667eea',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          marginBottom: '1rem'
-        }} />
-        <p style={{ fontSize: '1.2rem', color: '#667eea', fontWeight: 600 }}>🍬 Loading sweets...</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-8">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full mb-4"
+        />
+        <motion.p
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="text-xl font-bold gradient-text"
+        >
+          Loading delicious sweets...
+        </motion.p>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      width: '100%', 
-      padding: '3rem 2rem',
-      maxWidth: '1600px',
-      margin: '0 auto'
-    }}>
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-12 max-w-7xl mx-auto">
       {/* Section Header */}
-      <div style={{ 
-        textAlign: 'center', 
-        marginBottom: '3rem',
-        animation: 'fadeIn 0.6s ease-out'
-      }}>
-        <h2 style={{ 
-          color: '#667eea', 
-          fontWeight: 800, 
-          fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
-          marginBottom: '0.5rem',
-          textShadow: '0 2px 10px rgba(102, 126, 234, 0.1)'
-        }}>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-12"
+      >
+        <motion.h2
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          className="text-4xl md:text-5xl lg:text-6xl font-black gradient-text mb-4"
+        >
           🎯 Explore Our Collection
-        </h2>
-        <p style={{ 
-          color: '#764ba2', 
-          fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-          fontWeight: 500
-        }}>
+        </motion.h2>
+        <p className="text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto">
           Discover the finest selection of delicious sweets and treats
         </p>
-      </div>
+      </motion.div>
 
       {/* Search Bar */}
-      <div style={{ marginBottom: '3rem' }}>
+      <div className="mb-12">
         <SearchBar onSearch={handleSearch} />
       </div>
 
       {/* Sweet Grid */}
-      {sweets.length === 0 ? (
-        <div style={{ 
-          textAlign: 'center', 
-          padding: '4rem 2rem',
-          background: '#fff',
-          borderRadius: '20px',
-          boxShadow: '0 10px 40px rgba(102, 126, 234, 0.1)',
-          maxWidth: '600px',
-          margin: '0 auto'
-        }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📭</div>
-          <h3 style={{ 
-            fontSize: '1.5rem', 
-            marginBottom: '0.5rem', 
-            color: '#667eea',
-            fontWeight: 700
-          }}>
-            No sweets found
-          </h3>
-          <p style={{ color: '#764ba2', fontSize: '1.1rem' }}>
-            Try adjusting your search or filters
-          </p>
-        </div>
-      ) : (
-        <>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '2rem',
-            marginBottom: '2rem'
-          }}>
-            {sweets.map(sweet => (
-              <SweetCard
-                key={sweet._id}
-                sweet={sweet}
-                onPurchase={handlePurchase}
-                onEdit={onEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
+      <AnimatePresence mode="wait">
+        {sweets.length === 0 ? (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="glass rounded-3xl p-12 text-center max-w-2xl mx-auto"
+          >
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-8xl mb-6"
+            >
+              <FiInbox className="mx-auto text-gray-300" />
+            </motion.div>
+            <h3 className="text-3xl font-bold text-gray-700 mb-3">
+              No sweets found
+            </h3>
+            <p className="text-lg text-gray-500">
+              Try adjusting your search or filters to find what you're looking for
+            </p>
+          </motion.div>
+        ) : (
+          <>
+            <motion.div
+              key="grid"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-8"
+            >
+              {sweets.map((sweet, index) => (
+                <motion.div
+                  key={sweet._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <SweetCard
+                    sweet={sweet}
+                    onPurchase={handlePurchase}
+                    onEdit={onEdit}
+                    onDelete={handleDelete}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
 
-          {/* Results Count */}
-          <div style={{
-            textAlign: 'center',
-            padding: '2rem',
-            color: '#667eea',
-            fontWeight: 600,
-            fontSize: '1.1rem'
-          }}>
-            Showing {sweets.length} delicious {sweets.length === 1 ? 'sweet' : 'sweets'} 🍬
-          </div>
-        </>
-      )}
-
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+            {/* Results Count */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+            >
+              <div className="inline-block glass rounded-full px-8 py-4">
+                <span className="text-lg font-bold gradient-text">
+                  Showing {sweets.length} delicious {sweets.length === 1 ? 'sweet' : 'sweets'} 🍬
+                </span>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

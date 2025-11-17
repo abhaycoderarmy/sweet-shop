@@ -1,147 +1,57 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { FiFacebook, FiTwitter, FiInstagram, FiYoutube, FiHeart } from 'react-icons/fi';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer style={{
-      width: '100vw',
-      left: 0,
-      background: 'linear-gradient(90deg, #1976d2 0%, #2196f3 100%)',
-      color: '#fff',
-      textAlign: 'center',
-      padding: 0,
-      marginTop: 'auto',
-      boxShadow: '0 -2px 8px rgba(25, 118, 210, 0.12)'
-    }}>
-      {/* Main Footer Content */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '3rem 1.5rem 2rem'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '2rem',
-          marginBottom: '2rem'
-        }}>
+    <footer className="bg-gradient-primary text-white mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginBottom: '1rem'
-            }}>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
-                padding: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <span style={{ fontSize: '1.75rem' }}>🍬</span>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white/20 p-2 rounded-xl">
+                <span className="text-3xl">🍬</span>
               </div>
-              <span style={{ 
-                fontWeight: 700, 
-                fontSize: '1.5rem',
-                background: 'linear-gradient(to right, #fff, #f0f0f0)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                Sweet Shop
-              </span>
+              <span className="text-2xl font-black">Sweet Shop</span>
             </div>
-            <p style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              lineHeight: '1.6',
-              margin: '0 0 1rem 0',
-              fontSize: '0.95rem'
-            }}>
+            <p className="text-white/80 mb-4 leading-relaxed">
               Your one-stop destination for all things sweet. Quality treats delivered with love.
             </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              {['facebook', 'twitter', 'instagram', 'youtube'].map((social) => (
-                <a
-                  key={social}
-                  href={`#${social}`}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    textDecoration: 'none',
-                    transition: 'all 0.3s ease',
-                    fontSize: '1.2rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                  aria-label={social}
+            <div className="flex gap-3">
+              {[
+                { icon: <FiFacebook />, href: '#' },
+                { icon: <FiTwitter />, href: '#' },
+                { icon: <FiInstagram />, href: '#' },
+                { icon: <FiYoutube />, href: '#' }
+              ].map((social, index) => (
+                <motion.a
+                  key={index}
+                  href={social.href}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white/20 p-3 rounded-full hover:bg-white/30 transition-all"
                 >
-                  {social === 'facebook' && '📘'}
-                  {social === 'twitter' && '🐦'}
-                  {social === 'instagram' && '📷'}
-                  {social === 'youtube' && '📺'}
-                </a>
+                  {React.cloneElement(social.icon, { className: 'text-xl' })}
+                </motion.a>
               ))}
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: 700,
-              marginBottom: '1rem',
-              color: '#fff'
-            }}>
-              Quick Links
-            </h3>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0
-            }}>
-              {[
-                { to: '/', label: 'Home' },
-                { to: '/products', label: 'Products' },
-                { to: '/about', label: 'About Us' },
-                { to: '/contact', label: 'Contact' }
-              ].map((link) => (
-                <li key={link.to} style={{ marginBottom: '0.75rem' }}>
+            <h3 className="text-lg font-bold mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {['Home', 'Products', 'About Us', 'Contact'].map((link) => (
+                <li key={link}>
                   <Link
-                    to={link.to}
-                    style={{
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      textDecoration: 'none',
-                      fontSize: '0.95rem',
-                      transition: 'all 0.3s ease',
-                      display: 'inline-block'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#fff';
-                      e.currentTarget.style.transform = 'translateX(5px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
+                    to="/"
+                    className="text-white/80 hover:text-white transition-colors inline-block hover:translate-x-1 transform duration-200"
                   >
-                    {link.label}
+                    {link}
                   </Link>
                 </li>
               ))}
@@ -150,45 +60,15 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: 700,
-              marginBottom: '1rem',
-              color: '#fff'
-            }}>
-              Customer Service
-            </h3>
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0
-            }}>
-              {[
-                { to: '/help', label: 'Help Center' },
-                { to: '/shipping', label: 'Shipping Info' },
-                { to: '/returns', label: 'Returns' },
-                { to: '/faq', label: 'FAQ' }
-              ].map((link) => (
-                <li key={link.to} style={{ marginBottom: '0.75rem' }}>
+            <h3 className="text-lg font-bold mb-4">Customer Service</h3>
+            <ul className="space-y-2">
+              {['Help Center', 'Shipping Info', 'Returns', 'FAQ'].map((link) => (
+                <li key={link}>
                   <Link
-                    to={link.to}
-                    style={{
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      textDecoration: 'none',
-                      fontSize: '0.95rem',
-                      transition: 'all 0.3s ease',
-                      display: 'inline-block'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#fff';
-                      e.currentTarget.style.transform = 'translateX(5px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
+                    to="/"
+                    className="text-white/80 hover:text-white transition-colors inline-block hover:translate-x-1 transform duration-200"
                   >
-                    {link.label}
+                    {link}
                   </Link>
                 </li>
               ))}
@@ -197,156 +77,47 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: 700,
-              marginBottom: '1rem',
-              color: '#fff'
-            }}>
-              Stay Updated
-            </h3>
-            <p style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '0.95rem',
-              marginBottom: '1rem',
-              lineHeight: '1.6'
-            }}>
-              Subscribe to get special offers and updates!
+            <h3 className="text-lg font-bold mb-4">Stay Updated</h3>
+            <p className="text-white/80 mb-4">
+              Subscribe to get special offers!
             </p>
-            <div style={{
-              display: 'flex',
-              gap: '0.5rem',
-              flexDirection: 'column'
-            }}>
+            <div className="space-y-2">
               <input
                 type="email"
                 placeholder="Enter your email"
-                style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  color: '#fff',
-                  fontSize: '0.95rem',
-                  outline: 'none',
-                  transition: 'all 0.3s ease',
-                  width: '100%',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                }}
+                className="w-full px-4 py-3 rounded-xl bg-white/20 border-2 border-white/30 text-white placeholder-white/60 focus:bg-white/30 focus:border-white/50 transition-all outline-none"
               />
-              <button
-                style={{
-                  background: '#fff',
-                  color: '#667eea',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '0.75rem 1.5rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  fontSize: '0.95rem',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(255, 255, 255, 0.2)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.2)';
-                }}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-white text-primary-600 font-bold py-3 rounded-xl hover:shadow-xl transition-all"
               >
                 Subscribe ✨
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-          margin: '2rem 0 1.5rem'
-        }} />
-
         {/* Bottom Bar */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '1rem',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            display: 'flex',
-            gap: '2rem',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            fontSize: '0.9rem'
-          }}>
-            <Link
-              to="/privacy"
-              style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                textDecoration: 'none',
-                transition: 'color 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'}
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              to="/terms"
-              style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                textDecoration: 'none',
-                transition: 'color 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'}
-            >
-              Terms of Service
-            </Link>
-            <Link
-              to="/cookies"
-              style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                textDecoration: 'none',
-                transition: 'color 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'}
-            >
-              Cookie Policy
-            </Link>
+        <div className="border-t border-white/20 pt-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
+                <Link
+                  key={link}
+                  to="/"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  {link}
+                </Link>
+              ))}
+            </div>
+            <p className="text-white/80 text-sm flex items-center gap-2">
+              © {currentYear} Sweet Shop. Made with <FiHeart className="text-red-400" />
+            </p>
           </div>
-
-          <p style={{
-            color: 'rgba(255, 255, 255, 0.8)',
-            fontSize: '0.9rem',
-            margin: 0,
-            fontWeight: 500
-          }}>
-            © {currentYear} Sweet Shop. All rights reserved. Made with 💜
-          </p>
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          footer > div > div:first-child {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </footer>
   );
 };

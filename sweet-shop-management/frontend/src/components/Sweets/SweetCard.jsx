@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { FiShoppingCart, FiEdit, FiTrash2, FiPackage } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const SweetCard = ({ sweet, onPurchase, onEdit, onDelete }) => {
@@ -16,302 +18,137 @@ const SweetCard = ({ sweet, onPurchase, onEdit, onDelete }) => {
     return emojis[category] || '🍬';
   };
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      chocolate: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
-      candy: 'linear-gradient(135deg, #FF69B4 0%, #FF1493 100%)',
-      gummy: 'linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%)',
-      lollipop: 'linear-gradient(135deg, #FF6347 0%, #FF4500 100%)',
-      toffee: 'linear-gradient(135deg, #D2691E 0%, #CD853F 100%)',
-      other: 'linear-gradient(135deg, #DEB887 0%, #D2B48C 100%)'
+  const getCategoryGradient = (category) => {
+    const gradients = {
+      chocolate: 'from-amber-600 to-orange-700',
+      candy: 'from-pink-500 to-rose-600',
+      gummy: 'from-purple-500 to-pink-500',
+      lollipop: 'from-red-500 to-orange-500',
+      toffee: 'from-yellow-600 to-amber-700',
+      other: 'from-blue-500 to-purple-600'
     };
-    return colors[category] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    return gradients[category] || 'from-primary-500 to-secondary-500';
   };
 
   return (
-    <div style={{
-      background: '#fff',
-      borderRadius: '20px',
-      boxShadow: '0 10px 40px rgba(102, 126, 234, 0.15)',
-      overflow: 'hidden',
-      transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-      position: 'relative',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-8px)';
-      e.currentTarget.style.boxShadow = '0 15px 50px rgba(102, 126, 234, 0.25)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 10px 40px rgba(102, 126, 234, 0.15)';
-    }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ duration: 0.3 }}
+      className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden"
     >
       {/* Category Badge */}
-      <div style={{
-        position: 'absolute',
-        top: '1rem',
-        right: '1rem',
-        background: getCategoryColor(sweet.category),
-        borderRadius: '12px',
-        padding: '0.5rem 1rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-        zIndex: 2
-      }}>
-        <span style={{ fontSize: '1.2rem' }}>{getCategoryEmoji(sweet.category)}</span>
-        <span style={{ 
-          color: '#fff', 
-          fontWeight: 700, 
-          fontSize: '0.85rem',
-          textTransform: 'capitalize'
-        }}>
-          {sweet.category}
-        </span>
+      <div className={`absolute top-4 right-4 z-10 bg-gradient-to-r ${getCategoryGradient(sweet.category)} text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm`}>
+        <span className="text-lg">{getCategoryEmoji(sweet.category)}</span>
+        <span className="capitalize">{sweet.category}</span>
       </div>
 
       {/* Image Container */}
-      <div style={{
-        width: '100%',
-        height: '200px',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+      <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
         {sweet.imageUrl ? (
-          <img 
-            src={sweet.imageUrl} 
-            alt={sweet.name} 
-            style={{ 
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transition: 'transform 0.4s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          <motion.img
+            src={sweet.imageUrl}
+            alt={sweet.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            loading="lazy"
           />
         ) : (
-          <div style={{ 
-            fontSize: '5rem',
-            opacity: 0.5,
-            transition: 'transform 0.4s ease'
-          }}>
-            {getCategoryEmoji(sweet.category)}
+          <div className="w-full h-full flex items-center justify-center">
+            <motion.span
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-8xl opacity-40"
+            >
+              {getCategoryEmoji(sweet.category)}
+            </motion.span>
           </div>
         )}
-        
+
         {/* Stock Badge */}
-        <div style={{
-          position: 'absolute',
-          bottom: '1rem',
-          left: '1rem',
-          background: sweet.quantity > 0 
-            ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' 
-            : 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-          borderRadius: '12px',
-          padding: '0.5rem 1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-        }}>
-          <span style={{ fontSize: '1rem' }}>
-            {sweet.quantity > 0 ? '📦' : '❌'}
-          </span>
-          <span style={{ 
-            color: '#fff', 
-            fontWeight: 700, 
-            fontSize: '0.85rem'
-          }}>
-            {sweet.quantity > 0 ? `${sweet.quantity} left` : 'Out of Stock'}
-          </span>
+        <div className={`absolute bottom-4 left-4 ${
+          sweet.quantity > 0 ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-rose-600'
+        } text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm`}>
+          <FiPackage />
+          <span>{sweet.quantity > 0 ? `${sweet.quantity} in stock` : 'Out of Stock'}</span>
         </div>
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
       {/* Content */}
-      <div style={{ 
-        padding: '1.5rem',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <h3 style={{ 
-          color: '#667eea', 
-          fontWeight: 800, 
-          fontSize: '1.4rem',
-          marginBottom: '0.5rem',
-          lineHeight: 1.3
-        }}>
+      <div className="p-6 space-y-4">
+        {/* Title */}
+        <h3 className="text-2xl font-bold text-gray-800 line-clamp-2 group-hover:text-primary-600 transition-colors">
           {sweet.name}
         </h3>
 
+        {/* Description */}
         {sweet.description && (
-          <p style={{ 
-            color: '#6B7280', 
-            fontSize: '0.95rem', 
-            lineHeight: 1.6,
-            marginBottom: '1rem',
-            flex: 1
-          }}>
+          <p className="text-gray-600 line-clamp-2 text-sm leading-relaxed">
             {sweet.description}
           </p>
         )}
 
-        {/* Price */}
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: '12px',
-          padding: '1rem',
-          marginBottom: '1rem',
-          textAlign: 'center'
-        }}>
-          <div style={{ 
-            color: 'rgba(255, 255, 255, 0.8)', 
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            marginBottom: '0.25rem'
-          }}>
+        {/* Price Tag */}
+        <div className="bg-gradient-primary rounded-2xl p-4 text-center transform group-hover:scale-105 transition-transform">
+          <div className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">
             Price
           </div>
-          <div style={{ 
-            color: '#fff', 
-            fontWeight: 800, 
-            fontSize: '2rem'
-          }}>
+          <div className="text-white text-3xl font-black">
             ${sweet.price.toFixed(2)}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '0.75rem',
-          flexDirection: 'column'
-        }}>
+        <div className="space-y-3 pt-2">
           {isAuthenticated && (
-            <button
+            <motion.button
               onClick={() => onPurchase(sweet)}
               disabled={sweet.quantity === 0}
-              style={{
-                background: sweet.quantity === 0 
-                  ? 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%)'
-                  : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '0.875rem 1.5rem',
-                fontWeight: 700,
-                fontSize: '1rem',
-                cursor: sweet.quantity === 0 ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                opacity: sweet.quantity === 0 ? 0.6 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (sweet.quantity > 0) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (sweet.quantity > 0) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-                }
-              }}
+              whileHover={sweet.quantity > 0 ? { scale: 1.02 } : {}}
+              whileTap={sweet.quantity > 0 ? { scale: 0.98 } : {}}
+              className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 ${
+                sweet.quantity === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl'
+              }`}
             >
-              <span style={{ fontSize: '1.2rem' }}>
-                {sweet.quantity === 0 ? '❌' : '🛒'}
-              </span>
-              <span>{sweet.quantity === 0 ? 'Out of Stock' : 'Purchase Now'}</span>
-            </button>
+              <FiShoppingCart className="text-xl" />
+              <span>{sweet.quantity === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+            </motion.button>
           )}
 
           {isAdmin && (
-            <div style={{ 
-              display: 'flex', 
-              gap: '0.75rem'
-            }}>
-              <button
+            <div className="grid grid-cols-2 gap-3">
+              <motion.button
                 onClick={() => onEdit(sweet)}
-                style={{
-                  flex: 1,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '0.75rem 1rem',
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-gradient-primary text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all"
               >
-                <span>✏️</span>
+                <FiEdit />
                 <span>Edit</span>
-              </button>
-              
-              <button
+              </motion.button>
+
+              <motion.button
                 onClick={() => onDelete(sweet._id)}
-                style={{
-                  flex: 1,
-                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '0.75rem 1rem',
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-gradient-to-r from-red-500 to-rose-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all"
               >
-                <span>🗑️</span>
+                <FiTrash2 />
                 <span>Delete</span>
-              </button>
+              </motion.button>
             </div>
           )}
         </div>
       </div>
-    </div>
+
+      {/* Shine Effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+    </motion.div>
   );
 };
 
